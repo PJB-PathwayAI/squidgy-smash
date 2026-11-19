@@ -85,7 +85,7 @@ window.addEventListener('orientationchange',function(){setTimeout(resize,120);})
 var C={
   bg:'#0d171d', c64bg:'#352879', c64text:'#7869c4', c64light:'#7c70da',
   white:'#f2f2f2', red:'#c04040', orange:'#d07040', yellow:'#c0a030',
-  green:'#509040', blue:'#3030c0', purple:'#7645dc', dim:'#4a5560', ink:'#05090c',
+  green:'#509040', blue:'#3030c0', purple:'#7645dc', dim:'#4a5560', mid:'#7d8a96', ink:'#05090c',
   squid:'#01b7fe', squidDark:'#04141c'
 };
 var COLCOL={'1':C.red,'2':C.orange,'3':C.yellow,'4':C.green,'5':C.blue,'6':C.purple};
@@ -127,19 +127,51 @@ logoImg.onload=function(){ logoOk=true; };
 logoImg.src=LOGO_SRC;
 var LOGO_W=112, LOGO_H=25;
 
-function drawLogoPlate(cx,y,scale){
-  var s=scale||1;
-  var lw=Math.round(LOGO_W*s), lh=Math.round(LOGO_H*s);
+/* Product marks for the level intro cards. Only the artwork is embedded; the
+   light plate is drawn in code so every brand sits in the same frame as
+   InsightCP. Logos stay on file as the master assets and are used unaltered. */
+var GAPMAP_SRC='data:image/png;base64,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';
+var MATE_SRC='data:image/png;base64,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';
+var REGO_SRC='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFUAAAAeCAMAAABqtKLHAAAAkFBMVEUcFCL19PX0ISQRDhz34AdcWmMEAzVfFSKjGiPxEGH1KJmfnqKcziygOOvhWOUPDBitSetdXBldIFY3LUZrM5GeGFs5rl9Ms1lbxVj7Rbn3nOv99FoySyqppxf896GJdhCx31bXoQ64NpAmeEh+fIONdJ4AAFU9x3BVVQBlhSCOpU29vMD//wAWEiIAAAAIBxcy6dTcAAAAMHRSTlP5/f6k/v4O/f79/f79/f1d/f7+/fz9/f39/P39/v39/f3+/v7+/QP+A//9/gL9APxwaO+uAAADQklEQVR42qWW6XbaMBCFLxghBYxtvEAgJOm+K/P+b9c7Wry0/dG0cw7WWEifr64WGy9jbOsCwkBRb1/+L5CTuhC0w7vdbhhaEMynvC7+QN0Wvt1dqstlF+Ku9cX2v7XW0u6q6/VaJSjDSvHKmPlG6val9sPlulqRepmwLfwrA6hnWoPSFamTAxqDpNaSYsqYIiepNoG3o1Ycn9G+qxiZGrE2NhWYEOSkzMCLN+aDJiHbG+MTt+bYSf0CbDabIwi+VNWceocoxaxi7OVjysxY182yjFVqjceHp6cHcnVpLajRA9kr8bt2DBmjMzFZrXzMFJvtJRY/cNw8kfqweRsMwjBRo1ildqJXw1/cKEGvJj5msUjTQOqWUhk0AUjW2+EuYV2gag90vCIP1qgdnoZCpUp8cqb64gUFNorM0DCRakUSq/er7GumIjH0cZEvM60epB4Dk7YuVh7skCwQjFMERWjsQ0LqXrVyfGbmK50FIvUoywUteHZuCNROEYGT5ojrSBN1OcoPs2UmQpGoR/RYMln5du1oi4RBhvmZltj+tyU2g+pQSS0fpW+6sVqSfnKDA8ZwCXS6+M24H1qz338w8W9VD1kaeCzLEm3TfMwLQzJTpzBt09lmXdz6eeYnWUBZ3rqmuV5b+ZUZqdZabaqFDcGpDAVFhb+QWsyohS+/oml4CDQcjtwe59BHLnNZr9dWxK3p8jqEtbF0woQN+Ncavxxe4EwptKpawbc3b8oZVVdGQGn/QLUUBqdkXhCooYGdW1BwxUp/OARsI2dCGXMDEDq5rNE5ZynOcbPGCvCOJXfhJHfL0yVQGYeqxfm+jBGgzzRAqTZy08hdpPLGuuSC/mZ7U89X+EOKBqf7jCVY11WgBgw7asHeomboEBDro9mC6dDSU1u6RK16nE+j3DKeWEFHoMBFAEbQ6IrWYjxc0humG8W+vz9l7jE8HdY5Pf3AwsWIpYXWWfWZdjiXqcjv2FqQqD0IPZ2Ve8tDEp0yHbi+YmahBJ/niLfISqc3t++bJPazir0/L7dgvCQ5GCsWTTBCp68MQX9oglgiT1huwb99dedPk+mLiOK6tu9xu0G33D9E/ft3luot4kHx719vn1L5E6+/7B1v6YTAAAAAAElFTkSuQmCC';
+var GAPMAP_A=154/40, MATE_A=204/40, REGO_A=85/30;
+var gapmapImg=new Image(), mateImg=new Image(), regoImg=new Image();
+gapmapImg.src=GAPMAP_SRC; mateImg.src=MATE_SRC; regoImg.src=REGO_SRC;
+
+function plateFrame(cx,y,lw,lh){
   var pw=lw+14, ph=lh+10;
   var x=Math.round(cx-pw/2);
   g.fillStyle='#eef2f5'; g.fillRect(x,y,pw,ph);
   g.fillStyle='#b9c6d0'; g.fillRect(x,y,pw,1); g.fillRect(x,y+ph-1,pw,1);
+  return {x:x+7, y:y+5, w:lw, h:lh, ph:ph};
+}
+function drawBrandImg(cx,y,img,lw,lh){
+  var r=plateFrame(cx,y,lw,lh);
+  if(img && img.complete && img.naturalWidth){
+    g.imageSmoothingEnabled=true;
+    g.drawImage(img, r.x, r.y, r.w, r.h);
+    g.imageSmoothingEnabled=false;
+  }
+  return r;
+}
+function drawMark(cx,y,img,lw,lh){
+  /* Raw mark, no plate. Used where the logo is already designed for a dark
+     background (Rego Media's dark pill). */
+  if(img && img.complete && img.naturalWidth){
+    g.imageSmoothingEnabled=true;
+    g.drawImage(img, Math.round(cx-lw/2), y, lw, lh);
+    g.imageSmoothingEnabled=false;
+  }
+}
+function drawLogoPlate(cx,y,scale){
+  var s=scale||1;
+  var lw=Math.round(LOGO_W*s), lh=Math.round(LOGO_H*s);
+  var r=plateFrame(cx,y,lw,lh);
   if(logoOk){
     g.imageSmoothingEnabled=true;
-    g.drawImage(logoImg, x+7, y+5, lw, lh);
+    g.drawImage(logoImg, r.x, r.y, lw, lh);
     g.imageSmoothingEnabled=false;
   } else {
-    text('INSIGHTCP',cx,y+ph/2-5,10,'#3154ff','center',1);
+    text('INSIGHTCP',cx,y+r.ph/2-5,10,'#3154ff','center',1);
   }
 }
 
@@ -589,11 +621,13 @@ function drawBackdrop(){
 function drawBoot(){
   g.fillStyle=C.bg; g.fillRect(0,0,W,H);
   drawSquid(W/2,10,78);
-  text('SQUIDGY SMASH',W/2,94,13,C.white,'center',2);
-  text('PATHWAYAI LTD   MMXXVII',W/2,114,7,C.dim,'center',1);
-  if((Math.sin(frame/18)+1)/2>0.35) text('TAP TO LOAD',W/2,136,12,C.yellow,'center',2);
-  drawLogoPlate(W/2,166,1);
-  text('PRESENTED BY',W/2,208,7,C.dim,'center',2);
+  text('SQUIDGY SMASH',W/2,88,13,C.white,'center',2);
+  text('PATHWAYAI LTD   MMXXVII',W/2,106,7,C.dim,'center',1);
+  if((Math.sin(frame/18)+1)/2>0.35) text('TAP TO LOAD',W/2,122,12,C.yellow,'center',2);
+  drawLogoPlate(W/2,142,0.85);
+  text('PRESENTED BY',W/2,180,7,C.dim,'center',2);
+  text('MEDIA PARTNER',W/2,200,6,C.mid,'center',2);
+  drawMark(W/2,210,regoImg,Math.round(16*REGO_A),16);
 }
 
 function drawLoading(){
@@ -638,7 +672,8 @@ function drawTitle(){
   drawSponsorPlate(56,136,W-112,32,sp,'PRINCIPAL PARTNER');
 
   drawLogoPlate(W/2,176,0.75);
-  text('HI '+('000000'+hiScore).slice(-6),W/2,212,8,C.dim,'center',1);
+  text('AN INSIGHTCP\u2122 ARCADE GAME',W/2,210,7,C.mid,'center',1);
+  text('HI '+('000000'+hiScore).slice(-6),W/2,225,8,C.dim,'center',1);
 }
 
 function drawSyntax(){
@@ -650,6 +685,17 @@ function drawSyntax(){
   text('TAP TO CONTINUE',W/2,198,9,C.dim,'center',1);
 }
 
+function drawLevelBrand(){
+  /* Discreet product identity at the head of each level card. Sponsor plate
+     below is untouched and stays the focal element. */
+  var y=26, h=20, cx=W/2;
+  if(levelIdx===0)      drawBrandImg(cx,y,logoImg,   Math.round(h*(LOGO_W/LOGO_H)),h);
+  else if(levelIdx===1) drawBrandImg(cx,y,gapmapImg, Math.round(h*GAPMAP_A),h);
+  else if(levelIdx===2) drawBrandImg(cx,y,mateImg,   Math.round(h*MATE_A),h);
+  else if(levelIdx===3) text('OCI ADVISORY SERVICES',cx,y+11,8,C.white,'center',2);
+  else if(levelIdx===4) text('PATHWAYAI LTD',cx,y+11,9,C.white,'center',2);
+}
+
 function drawIntroCard(){
   var sp = inSecret ? SPONSORS[2] : sponsorFor(levelIdx);
   g.fillStyle='rgba(5,9,12,0.86)';
@@ -658,6 +704,7 @@ function drawIntroCard(){
     text('SECRET AREA',W/2,84,19,C.purple,'center',3);
     text('YOU FOUND IT',W/2,112,11,C.white,'center',2);
   } else {
+    drawLevelBrand();
     text('LEVEL '+(levelIdx+1),W/2,76,19,C.white,'center',3);
     text('BROUGHT TO YOU BY',W/2,104,8,C.dim,'center',2);
     drawSponsorPlate(48,122,W-96,38,sp,'LEVEL PARTNER');
@@ -713,6 +760,7 @@ function drawOver(win){
     text(qualifies(score)?'TAP TO ENTER INITIALS':'TAP FOR HIGH SCORES',W/2,168,10,C.c64light,'center',1);
   }
   drawLogoPlate(W/2,194,0.7);
+  text('A PATHWAYAI LTD CREATION',W/2,226,6,C.mid,'center',1);
 }
 
 function drawEntry(){
